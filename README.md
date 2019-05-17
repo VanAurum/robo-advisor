@@ -16,6 +16,8 @@ assets=['TLT','SPY','GDX','AAPL','FXI','GLD','VDE','UUP','VT']
 optimal_portfolio=PortfolioOptimizer(assets, portfolio_size=5,max_pos=1.0, min_pos=0.0)
 ```
 
+#### Output...
+
 ```
 ...Maximum position size: 100%
 ...Minimum position size: 0%
@@ -63,4 +65,64 @@ Optimal Portfolio Sharpe Ratio: 0.7573
 Optimal Portfolio Return: 2.755
 Optimal Portfolio Volatility: 4.651
 Optimal Portfolio Sharpe Ratio: 0.5924
+```
+
+#### Example 2: Building a portfolio of 5 assets from a list of 12 assets with constraints.
+
+In this example we're going to constrain the maximum position size of a single asset to be 30%, and the minumum size to be 5%.
+
+```Python
+assets=['TLT','SPY','GDX','AAPL','FXI','GLD','VDE','UUP','VT','IYF','EWI','TIP']
+optimal_portfolio=PortfolioOptimizer(assets, portfolio_size=5,max_pos=0.30, min_pos=0.05)
+```
+
+#### Output...
+```
+...Maximum position size: 30%
+...Minimum position size: 5%
+...Number of unique asset combinations: 792
+...Analyzing 792 of 792 asset combinations...
+...Omitted assets: []
+
+-----------------------------------------------
+----- Portfolio Optimized for Sharpe Ratio ----
+-----------------------------------------------
+
+('TLT', 0.1981)
+('SPY', 0.1089)
+('AAPL', 0.1495)
+('UUP', 0.2435)
+('TIP', 0.3)
+
+Optimal Portfolio Return: 6.5281
+Optimal Portfolio Volatility: 6.1652
+Optimal Portfolio Sharpe Ratio: 1.0589
+
+-----------------------------------------------
+----- Portfolio Optimized for Pure Return -----
+-----------------------------------------------
+
+('TLT', 0.05)
+('SPY', 0.3)
+('AAPL', 0.3)
+('VT', 0.05)
+('IYF', 0.3)
+
+Optimal Portfolio Return: 12.1792
+Optimal Portfolio Volatility: 21.8554
+Optimal Portfolio Sharpe Ratio: 0.5573
+
+-----------------------------------------------------
+----- Portfolio Optimized for Minimal Volatility ----
+-----------------------------------------------------
+
+('TLT', 0.1276)
+('SPY', 0.1693)
+('GLD', 0.1031)
+('UUP', 0.3)
+('TIP', 0.3)
+
+Optimal Portfolio Return: 3.6682
+Optimal Portfolio Volatility: 4.3676
+Optimal Portfolio Sharpe Ratio: 0.8399
 ```
