@@ -6,6 +6,9 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
+quandl = "*"
+scipy = "*"
+matplotlib = "*"
 
 [requires]
 python_version = "3.7"
