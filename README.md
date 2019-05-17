@@ -223,5 +223,4 @@ Minimum weight reached for XLI: 0.0276
 Average of XLI portfolio weight: 0.0556
 ```
 
-![Asset Weight History]
-(https://raw.githubusercontent.com/VanAurum/robo-advisor/master/static/asset_weight_history.png)
+![Asset Weight History](https://raw.githubusercontent.com/VanAurum/robo-advisor/master/static/asset_weight_history.png)
