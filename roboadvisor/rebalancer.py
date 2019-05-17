@@ -1,34 +1,67 @@
 '''
 @author: Kevin Vecmanis
 '''
+#Standard Python Library imports
+import numpy as np
+import matplotlib
+import time
+import statistics
 
+#Local imports
+
+#3rd party imports
 
 class RebalancingSimulator:
+    '''
+    RebalancingSimulator runs rebalancing scenarios on an optimal portfolio object calculated by the 
+    PortfolioOptimizer class.  
+
+    Parameters:
+    -----------
+    p : object
+        A portfolio object from the PortfolioOptimizer class.
+    frac_units : bool, optional (default=True) 
+        Whether or not fractional units are permitted in the simulation.
+    starting_cash : int, optional (default=20000)
+        The beginning cash value of the simulation before any positions are taken.
+    trade_cost : float, optional (default=5.99)
+        The cost to execute a trade.
+    max_thresh: float, optional (default=1.1)
+        The factor by which an asset weight can exceed its target threshold on the upside.
+    min_thres: float, optional (default=0.9)
+        The factor by which an asset weight can exceed its target threshold on the downside.                 
+    '''
     
     
-    def __init__(self,p,frac_units=True,portfolio_value=20000,trade_cost=5):
+    def __init__(self,p,frac_units=True,starting_cash=20000,trade_cost=5.99,max_thresh=1.1, min_thresh=0.9):
         
         import numpy as np
-        self.thresh_high_=1.1
-        self.thresh_low_=0.9
+        self.thresh_high_=max_thresh
+        self.thresh_low_=min_thresh
         self.trade_cost_=trade_cost
         self.optimal_portfolio_=p
         self.frac_units_=frac_units
-        self.starting_portfolio_value_=portfolio_value       
+        self.starting_portfolio_value_=starting_cash      
         self._data_prep()
-        #self.cash_balance_=self.starting_portfolio_value_
-        self.starting_cash_balance_=portfolio_value
+        self.cash_balance_=self.starting_portfolio_value_
+        self.starting_cash_balance_=starting_cash
         self._initialize_portfolio()
-        self.random_walk_iters_=2520
-
-        
+        self.random_walk_iters_=2520 
         print('Cash balance after portfolio initialization: ',self.starting_residual_cash)
-        
         
 
     def _data_prep(self):
-        
-        import numpy as np
+        '''
+        Prepares data required from the simulation from the portfolio object.  Creates a list for each asset 
+        called starting_vals which contains the following: 
+         - Asset name
+         - The latest closing price of the asset
+         - Asset's average daily return
+         - Asset's average daily volatility 
+         - The target weight of this asset in the optimal portfolio.  
+
+
+        '''
         
         sharpe_port=self.optimal_portfolio_.best_sharpe_portfolio_
         df=self.optimal_portfolio_.raw_asset_data.copy()    
@@ -47,26 +80,30 @@ class RebalancingSimulator:
         starting_vals=[]
         count=0
         
-        for asset in asset_list:
-            
+        for asset in asset_list:      
             asset_ret=np.log(df[asset]/df[asset].shift(1)).mean().values[0]
             asset_vol=np.log(df[asset]/df[asset].shift(1)).std().values[0]        
-            starting_vals.append([asset,
-                                  latest[asset].values[0][0],
-                                  round(asset_ret,5),
-                                  round(asset_vol,5),
-                                  weights[count]])
+            starting_vals.append([
+                asset,
+                latest[asset].values[0][0],
+                round(asset_ret,5),
+                round(asset_vol,5),
+                weights[count],
+                ])
             count+=1
         
         self.starting_vals_=starting_vals 
         self.target_weights_=weights
         self.asset_list_=[x[0] for x in self.starting_vals_]
-        print('Target weights: ', list(zip(self.asset_list_,self.target_weights_)))
-        
+        print('Target weights: ', list(zip(self.asset_list_,self.target_weights_))) 
         return   
     
     
     def _initialize_portfolio(self):
+        '''
+        Initializes the portfolio at T=0 using the latest closing price data, trade cost, the starting cash value, 
+        and the desired weights of each asset.  
+        '''
     
         #initialize portfolio:
         starting_vals=self.starting_vals_
@@ -94,21 +131,17 @@ class RebalancingSimulator:
             portfolio_init.append((starting_vals[i][0],round(num_units,4)))
         
         self.starting_unit_holdings_=[x[1] for x in portfolio_init]
-        self.initialized_portfolio_=portfolio_init
-        #print('Unit holdings after initialization: ', self.initialized_portfolio_)
-        
+        self.initialized_portfolio_=portfolio_init     
         return
     
 
-    def _random_walks(self,plot=True):
-    
-        import matplotlib.pyplot as plt
-        import numpy as np
-        #using the historical mean daily return and volatility of each asset,
-        #we're going to create random walks to simulatate returns for each asset
-        #in the portfolio. 
-        
-        
+    def _random_walks(self,plot=False):
+        '''
+        Using the historical mean daily return and volatility of each asset,
+        we're going to create random walks to simulatate returns for each asset
+        in the portfolio. 
+        '''
+
         starting_vals=self.starting_vals_
         random_walks=[]
 
@@ -139,23 +172,22 @@ class RebalancingSimulator:
         return random_walks    
     
     
-    def run_simulation(self):
+    def run_simulation(self, plot=False):
+        '''
+        Runs the rebalancing simulation, tracking the following:
+            - Cash history
+            - Number of trades
+            - Portfolio Value
+            - Asset weights and their deviations
+        '''
         
-        import matplotlib.pyplot as plt
-        import time
-        import statistics
-        
-        start=time.time()
-        
-        self.total_trades_=0
-        
+        start=time.time() 
+        self.total_trades_=0  
         portfolio_values=[]
         weight_history=[]
         unit_history=[]
         cash_history=[]
         trade_history=[]
-
-        #starting_portfolio=self.initialized_portfolio_       
             
         price_simulations=self._random_walks(plot=False)
         self.current_unit_holdings_=self.starting_unit_holdings_
@@ -179,31 +211,32 @@ class RebalancingSimulator:
         self.sim_holding_history_=unit_history
         self.sim_cash_history_=cash_history
         self.sim_trade_history_=trade_history
-        
-        plt.figure(figsize=(12,4))
-        plt.title('Simulated Portfolio Value')
-        plt.plot(self.sim_port_vals_)        
-        plt.show()   
-        
-        plt.figure(figsize=(12,4))
-        plt.title('Simulation Cash Level')
-        plt.plot(self.sim_cash_history_)        
-        plt.show()    
-        
-        plt.figure(figsize=(12,4))
-        plt.title('Simulation Trade History')
-        plt.plot(self.sim_trade_history_)        
-        plt.show()   
-        
-        plt.figure(figsize=(12,4))
-        plt.title('Asset Weight History')
-        for i in range(len(self.asset_list_)):
-            trace=[x[i] for x in self.sim_weight_vals_]            
-            plt.plot(trace,label=self.asset_list_[i])
-        plt.legend()    
-        plt.show()           
 
-        
+
+        if plot==True:
+            plt.figure(figsize=(12,4))
+            plt.title('Simulated Portfolio Value')
+            plt.plot(self.sim_port_vals_)        
+            plt.show()   
+            
+            plt.figure(figsize=(12,4))
+            plt.title('Simulation Cash Level')
+            plt.plot(self.sim_cash_history_)        
+            plt.show()    
+            
+            plt.figure(figsize=(12,4))
+            plt.title('Simulation Trade History')
+            plt.plot(self.sim_trade_history_)        
+            plt.show()   
+            
+            plt.figure(figsize=(12,4))
+            plt.title('Asset Weight History')
+            for i in range(len(self.asset_list_)):
+                trace=[x[i] for x in self.sim_weight_vals_]            
+                plt.plot(trace,label=self.asset_list_[i])
+            plt.legend()    
+            plt.show()           
+
         self.total_trades_=sum(self.sim_trade_history_)
         self.total_trade_cost_=self.trade_cost_*self.total_trades_
         
@@ -236,7 +269,9 @@ class RebalancingSimulator:
         return    
     
     def reset_sim(self):
-        
+        '''
+        Resets the simulation values back to original state
+        '''
         self.current_unit_holdings_=[]
         self._initialize_portfolio()
         self.current_unit_holdings_=self.starting_unit_holdings_
@@ -245,11 +280,9 @@ class RebalancingSimulator:
 
 
     def run_monte_carlo(self,iterations=1,print_report=False):
-        
-        import matplotlib.pyplot as plt
-        import time
-        import statistics
-        
+        '''
+        Runs a monte carlo simulation on possible trajectories of the optimal portfolio
+        '''
         start=time.time()
         self.sim_port_vals_=[]
         self.sim_weight_vals_=[]
@@ -266,7 +299,6 @@ class RebalancingSimulator:
             unit_history=[]
             cash_history=[]
             trade_history=[]
-            #self.reset_sim()
        
             price_simulations=self._random_walks(plot=False)
             
@@ -295,6 +327,19 @@ class RebalancingSimulator:
 
     
     def _calculate_sim_metrics(self):
+        '''
+        Calculates and summarizes the metrics for the trade simulation.  Calculated metrics are:
+            - Number of simulations run
+            - Mean Terminal Portfolio Value
+            - Standard Deviation of Terminal Portfolio Values
+            - Mean number of total trades executed
+            - Standard Deviation of total trades executed
+            - Mean total trade cost
+            - Standard Deviation of total trade costs
+            - Duration of each simulation (in years)
+            - Upper rebalance threshold
+            - Lower rebalance threshold
+        '''
         
         import statistics
         #Weight metrics:
@@ -334,34 +379,12 @@ class RebalancingSimulator:
         print('Upper rebalance threshold: ', self.thresh_high_)
         print('Lower rebalance threshold: ', self.thresh_low_)
         print('')
-        
-                                 
-        
-        '''
-        weights_means=[]
-        x=self.sim_weight_vals_
-        for i in range(len(self.asset_list_)):
-            for j in range(len(x)):
-                weights_means.append(round(statistics.mean(x[i]),4))
-        
-        for i in range(len(self.asset_list_)):
-            for j in range(len(x)):
-                weight_history=[x[i] for x in self.sim_weight_vals_[j]]
-                asset=self.asset_list_[i]
-                print('Weight metrics for: ',asset)
-                print('-------------------------')
-                print('  Target portfolio weight: ',self.target_weights_[i])
-                print('  Standard deviation of '+asset+' portfolio weight: ',round(statistics.stdev(weight_history),4))
-                print('  Maximum weight reached for '+asset+': ', round(max(weight_history),4))
-                print('  Minimum weight reached for '+asset+': ', round(min(weight_history),4))
-                print('  Average of '+asset+' portfolio weight: ',round(statistics.mean(weight_history),4))
-                print('')     
-       '''         
+              
         
     def _plot_sim_results(self):   
-        
-        import matplotlib.pyplot as plt
-        import time
+        '''
+        Plots the results of the rebalancing simulation
+        '''
         
         plt.figure(figsize=(12,4))
         plt.title('Simulated Portfolio Value')
@@ -392,46 +415,14 @@ class RebalancingSimulator:
                 trace=[x[j] for x in self.sim_weight_vals_[i]]            
                 plt.plot(trace,color=colors[j])
         plt.show()           
-
-        '''
-        self.total_trades_=sum(self.sim_trade_history_)
-        self.total_trade_cost_=self.trade_cost_*self.total_trades_
         
-        print('')
-        print('')
-        print('SIMULATION REPORT')
-        print('-----------------')
-        print('Rebalancing simulation finished in: %.2f seconds' % (time.time() - start))
-        print('Total number of trades executed: ', self.total_trades_)
-        print('Cost per trade: ', round(self.trade_cost_,2))
-        print('Total trading costs: ', round(self.total_trade_cost_,2))
-        print('Maximum cash balance: ', round(max(self.sim_cash_history_),2))
-        print('Minimum cash balance: ', round(min(self.sim_cash_history_),2))
-        print('Average cash balance: ', round((sum(self.sim_cash_history_)/len(self.sim_cash_history_)),2))
-        print('Fractional units allowed? ',str(self.frac_units_))
-        print('')
-        
-        for i in range(len(self.asset_list_)):
-            weight_history=[x[i] for x in self.sim_weight_vals_]
-            asset=self.asset_list_[i]
-            print('Weight metrics for: ',asset)
-            print('-------------------------')
-            print('  Target portfolio weight: ',self.target_weights_[i])
-            print('  Standard deviation of '+asset+' portfolio weight: ',round(statistics.stdev(weight_history),4))
-            print('  Maximum weight reached for '+asset+': ', round(max(weight_history),4))
-            print('  Minimum weight reached for '+asset+': ', round(min(weight_history),4))
-            print('  Average of '+asset+' portfolio weight: ',round(statistics.mean(weight_history),4))
-            print('')
-        '''
-        
-        #print('Time to finish simulation: %.2f seconds' % (time.time() - start))
         return    
 
     
-    
     def _get_portfolio_values(self):
-    
-        
+        '''
+        Updates the portfolio values at each iteration of the simulation
+        '''
         
         unit_holdings=self.current_unit_holdings_
         unit_prices=self.current_unit_prices_
@@ -442,6 +433,7 @@ class RebalancingSimulator:
         #multiply new asset prices by current unit holdings
         #to return the new portfolio value.  This can be accomplished
         #in one line using iterators.
+
         port_val=sum(x * y for x, y in zip(unit_holdings, unit_prices))+self.sim_cash_balance_
         new_weights=[(x*y)/port_val for x,y in zip(unit_holdings, unit_prices)]
         weight_diffs=[(x/y) for x,y in zip(new_weights, target_weights)]
@@ -500,5 +492,4 @@ class RebalancingSimulator:
         
         self.current_unit_holdings_=unit_holdings
 
-    
-        return port_val, new_weights, weight_diffs, new_target_vals,unit_holdings,trade_count    
+        return port_val, new_weights, weight_diffs, new_target_vals, unit_holdings, trade_count    
