@@ -224,4 +224,4 @@ Average of XLI portfolio weight: 0.0556
 ```
 
 ![Asset Weight History]
-(https://github.com/VanAurum/robo-advisor/tree/master/static/asset_weight_history.png)
+(https://raw.githubusercontent.com/VanAurum/robo-advisor/master/static/asset_weight_history.png)
