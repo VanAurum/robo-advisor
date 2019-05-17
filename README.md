@@ -156,7 +156,7 @@ rebalancer=RebalancingSimulator(portfolio,frac_units=False,,trade_cost=5.99,star
 rebalancer.run_simulation()
 ```
 
-####Output...
+#### Output...
 ```
 SIMULATION PARAMETERS:
 ...fractional share purchases permitted? False
@@ -222,3 +222,5 @@ Maximum weight reached for XLI: 0.0637
 Minimum weight reached for XLI: 0.0276
 Average of XLI portfolio weight: 0.0556
 ```
+
+![Asset Weight History](https://github.com/VanAurum/robo-advisor/tree/master/static/asset_weight_history.png)
