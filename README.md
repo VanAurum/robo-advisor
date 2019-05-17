@@ -4,10 +4,14 @@ This is an open source initiative to make available the tools required for build
 
 The mission of this project is to put industry leading portfolio management tools into the hands of individuals for zero cost.
 
+## Usage
 
-## Algorithmic Portfolio Optimization
+### Algorithmic Portfolio Optimization
 
 #### Example 1: Building a portfolio of 5 assets from a list of 9 assets. No additional contraints
+
+In this example we build a portfolio with no asset size constraints. Meaning, a single ETF or stock from our list can be 100% of
+the portfolio.
 
 ```Python
 from roboadvisor.optimizer import PortfolioOptimizer
