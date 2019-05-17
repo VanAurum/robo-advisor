@@ -1,9 +1,12 @@
 """
 @author: Kevin Vecmanis
 """
-
-import vm_portfolio_manager_r1 as pm
+#Standard Python library imports
 import unittest
+
+#Local imports
+from roboadvisor.optimizer import PortfolioOptimizer
+
 
 class TestPortfolioManager(unittest.TestCase):
     
@@ -12,7 +15,7 @@ class TestPortfolioManager(unittest.TestCase):
         
         assets=['GDX','GLD','SPY','XLI','VDE','AAPL','MSFT']
         auth_token="eecWhzC3y1A6ukinBsP_"        
-        self.pmo=pm.PortfolioOptimizer(assets,auth_token,print_init=True)
+        self.pmo=PortfolioOptimizer(assets,auth_token,print_init=True)
         
     
     def test_init(self):
@@ -58,8 +61,3 @@ class TestPortfolioManager(unittest.TestCase):
     def test_optimize_for_sharpe(self):
         print('Testing _optimize_for_sharpe') 
             
-
-        
-if __name__=="__main__":
-
-    unittest.main()  

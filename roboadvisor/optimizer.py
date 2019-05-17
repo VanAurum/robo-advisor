@@ -26,9 +26,26 @@ class PortfolioOptimizer:
     This class object receives a list of assets (tickers) and a portfolio size
     and returns the optimal portfolio optimized for Sharpe, Pure Return, and 
     Volatility
-    
+
+    Parameters:
+    -----------
+        assets : list 
+            A list of stock tickers that the optimizer should choose from the build the portfolio.
+        risk_tolerance: float, optional (default=5.0)
+            A number on a scale of 1.0 to 10.0 that indicates the acceptable risk level. 
+        portfolio_size: int, optional (default=5)
+            The number of assets that should be in the final optimal portfolio. 
+        max_iters: int, optional (default=None)
+            The number of times the portfolio simulation should be run by the optimizer.
+        print_init : bool, optional (default=True)
+            Whether or not to print the portfolio metrics after initialization.
+        max_pos : float, optional (default=1.0)
+            The maximum weight that one asset can occupy in a portfolio.  
+        min_pos : float, optional (default=0.0)
+            The minimum weight that one asset can occupy in a portfolio.
+
     Attributes:
-        
+    ------------    
         asset_basket_ - the list of assets in its entirety
         asset_errors_ - the number of stock tickers that weren't found on Quandl.
         cov_matrix_results - list of the covariance matrices for each unique asset combination.
@@ -51,15 +68,14 @@ class PortfolioOptimizer:
         vol_scores - comphrehensive matrix of simulation results for colatility optimization
         
     Methods:
-        
+    -------------    
         _fetch_data - Get data from quandl using the list of assets in asset_basket
         _plot_asset_prices - plot the normalized adjusted closes for all the assets.
         portfolio_simulation - simulate and plot markowitz bullet for one specified asset combination.
         portfolio_stats - calculates performance metrics for one set of weights on one asset combination.
         optimize_for_sharpe - Finds the optimal portfolio that provides best Sharpe ratio
         optimize_for_return - Finds the optimal portfolio that provides the best Return.
-        optimize_for_volatility - Finds the optimal portfolio that provides the smallest volatility.
-        
+        optimize_for_volatility - Finds the optimal portfolio that provides the smallest volatility.      
     '''
     
     def __init__(self,
@@ -82,7 +98,7 @@ class PortfolioOptimizer:
         self.max_iters_=max_iters
         self.portfolio_size_=portfolio_size
         self.assets_=assets
-        #self.num_assets_=portfolio_size
+        self.num_assets_=portfolio_size
         self.risk_tolerance_=risk_tolerance
         self.auth_token_=config.QUANDL_KEY
         self.sim_iterations_=2500
