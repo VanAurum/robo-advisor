@@ -108,7 +108,6 @@ class PortfolioOptimizer:
         self.optimize_for_volatility()
            
     def _fetch_data(self):
-    
         '''
         this function inherits the class and declares additional class attributes
         pertaining to the data we'll need for analysis.  We fetch data from quandl and 
@@ -238,7 +237,6 @@ class PortfolioOptimizer:
         print('---')
         
     def portfolio_stats(self,weights):
-    
         '''
         We can gather the portfolio performance metrics for a specific set of weights.
         This function will be important because we'll want to pass it to an optmization
@@ -255,8 +253,7 @@ class PortfolioOptimizer:
         --------
             array, portfolio statistics - mean, volatility, sharp ratio.
         
-        '''
-                        
+        '''        
         returns=self.return_matrix_
         cov_matrix=self.cov_matrix_
         
@@ -455,8 +452,7 @@ class PortfolioOptimizer:
         self.best_vol_portfolio_ = self.vol_scores_[0]
         temp = self.best_vol_portfolio_
 
-        if (self.print_init_ == True):
-            
+        if (self.print_init_ == True):      
             print('-----------------------------------------------------')
             print('----- Portfolio Optimized for Minimal Volatility ----')
             print('-----------------------------------------------------')
