@@ -76,8 +76,8 @@ Optimal Portfolio Sharpe Ratio: 0.5924
 In this example we're going to constrain the maximum position size of a single asset to be 30%, and the minumum size to be 5%.
 
 ```Python
-assets=['TLT','SPY','GDX','AAPL','FXI','GLD','VDE','UUP','VT','IYF','EWI','TIP']
-optimal_portfolio=PortfolioOptimizer(assets, portfolio_size=5,max_pos=0.30, min_pos=0.05)
+assets = ['TLT','SPY','GDX','AAPL','FXI','GLD','VDE','UUP','VT','IYF','EWI','TIP']
+optimal_portfolio = PortfolioOptimizer(assets, portfolio_size = 5, max_pos = 0.30, min_pos = 0.05)
 ```
 
 #### Output...
@@ -151,8 +151,9 @@ The rebalancer class takes a portfolio object as an argument as well. The simula
 from roboadvisor.rebalancer import RebalancingSimulator
 from roboadvisor.optimizer import PortfolioOptimizer
 
-portfolio=PortfolioOptimizer(['GLD','SPY','TLT','QQQ','XLI'],portfolio_size=5, max_pos=0.3, min_pos=0.05)
-rebalancer=RebalancingSimulator(portfolio,frac_units=False,trade_cost=5.99,starting_cash=20000,max_thresh=1.1, min_thresh=0.9)
+assets = ['GLD', 'SPY', 'TLT', 'QQQ', 'XLI']
+portfolio = PortfolioOptimizer(assets , portfolio_size = 5, max_pos = 0.3, min_pos = 0.05)
+rebalancer = RebalancingSimulator(portfolio, frac_units=False, trade_cost=5.99, starting_cash=20000, max_thresh=1.1, min_thresh=0.9)
 rebalancer.run_simulation()
 ```
 
